@@ -1,0 +1,48 @@
+﻿html {
+    
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+}
+
+header {
+    background-color: #777;
+    text-align: center;
+
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    line-height: 40px;
+
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 40px;       
+}
+
+header a{
+    background-position: center;
+    background-repeat: no-repeat;
+    background-image: url(/Resources/Images/indeks.png);
+    display: block;
+    width: 40px;
+    height: 40px;
+    position: absolute;
+    top: 0;
+    left: 20px;    
+}
+
+header div{   
+    margin-left: 40px;
+}
+
+#content {
+    /*background-image: url(/Resources/Images/pattern.png);*/
+    margin-top: 4vh;
+    text-align: center;
+}
+
+.unclickable-list-item {
+    z-index: -1;
+}
