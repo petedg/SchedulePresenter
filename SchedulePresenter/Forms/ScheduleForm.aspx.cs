@@ -60,11 +60,20 @@ namespace SchedulePresenter.Forms
 
             if (Request.QueryString["group"] != null)
             {
-                choosenGroupID = Int32.Parse(Request.QueryString["group"]);
-                label.InnerText = groupBehavior.GetGroupById((int)choosenGroupID).NAME;
-                DropDownList1.Visible = true;
-                buttonPdf.Visible = true;
-                buttonPng.Visible = true;
+                if (currentScheduleBehavior.HasCurrentSchedule(Int32.Parse(Request.QueryString["group"])))
+                {
+                    choosenGroupID = Int32.Parse(Request.QueryString["group"]);
+                    label.InnerText = groupBehavior.GetGroupById((int)choosenGroupID).NAME;
+                    DropDownList1.Visible = true;
+                    buttonPdf.Visible = true;
+                    buttonPng.Visible = true;
+                }
+                else
+                {
+                    label.InnerText = "Brak aktualnego planu dla grupy ";
+                    choosenGroupID = Int32.Parse(Request.QueryString["group"]);
+                    label.InnerText += groupBehavior.GetGroupById((int)choosenGroupID).NAME;                    
+                }
             }
             else
             {
@@ -103,61 +112,73 @@ namespace SchedulePresenter.Forms
 
         private void populateTreeView(Department department, HtmlGenericControl nodeListItem)
         {
-            HtmlGenericControl nestedUL = createNestedUL();
-
             MajorsList = new TreeViewData(context, department).MajorList;
 
-            foreach (Major major in MajorsList)
+            if (MajorsList.Count > 0)
             {
-                HtmlGenericControl listItem = createListTextItem(major.NAME, null);
-                nestedUL.Controls.Add(listItem);
-                populateTreeViewWithSubgroups_S1(major, listItem);
-            }
+                HtmlGenericControl nestedUL = createNestedUL();                
 
-            nodeListItem.Controls.Add(nestedUL);
+                foreach (Major major in MajorsList)
+                {
+                    HtmlGenericControl listItem = createListTextItem(major.NAME, null);
+                    nestedUL.Controls.Add(listItem);
+                    populateTreeViewWithSubgroups_S1(major, listItem);
+                }
+
+                nodeListItem.Controls.Add(nestedUL);
+            }            
         }
 
         private void populateTreeViewWithSubgroups_S1(Major major, HtmlGenericControl nodeListItem)
         {
-            HtmlGenericControl nestedUL = createNestedUL();
-
-            foreach (dynamic composite in major.CompositeSubgroupsList)
+            if (major.CompositeSubgroupsList.Count > 0)
             {
-                HtmlGenericControl listItem = createListTextItem(composite.Subgroup.NAME, null);
-                nestedUL.Controls.Add(listItem);
-                populateTreeViewWithSubgroups_S2(composite, listItem);
-                populateTreeViewWithGroups(composite, listItem);
-            }
+                HtmlGenericControl nestedUL = createNestedUL();
 
-            nodeListItem.Controls.Add(nestedUL);
+                foreach (dynamic composite in major.CompositeSubgroupsList)
+                {
+                    HtmlGenericControl listItem = createListTextItem(composite.Subgroup.NAME, null);
+                    nestedUL.Controls.Add(listItem);
+                    populateTreeViewWithSubgroups_S2(composite, listItem);
+                    populateTreeViewWithGroups(composite, listItem);
+                }
+
+                nodeListItem.Controls.Add(nestedUL);
+            }
         }
 
         private void populateTreeViewWithSubgroups_S2(dynamic parentComposite, HtmlGenericControl nodeListItem)
         {
-            HtmlGenericControl nestedUL = createNestedUL();
-
-            foreach (dynamic composite in parentComposite.CompositeSubgroupsList)
+            if (parentComposite.CompositeSubgroupsList.Count > 0)
             {
-                HtmlGenericControl listItem = createListTextItem(composite.Subgroup.NAME, null);
-                nestedUL.Controls.Add(listItem);
-                populateTreeViewWithSubgroups_S2(composite, listItem);
-                populateTreeViewWithGroups(composite, listItem);
-            }
+                HtmlGenericControl nestedUL = createNestedUL();
 
-            nodeListItem.Controls.Add(nestedUL);            
+                foreach (dynamic composite in parentComposite.CompositeSubgroupsList)
+                {
+                    HtmlGenericControl listItem = createListTextItem(composite.Subgroup.NAME, null);
+                    nestedUL.Controls.Add(listItem);
+                    populateTreeViewWithSubgroups_S2(composite, listItem);
+                    populateTreeViewWithGroups(composite, listItem);
+                }
+
+                nodeListItem.Controls.Add(nestedUL);
+            }
         }
 
         private void populateTreeViewWithGroups(dynamic composite, HtmlGenericControl nodeListItem)
         {
-             HtmlGenericControl nestedUL = createNestedUL();
+            if (composite.Groups.Count > 0)
+            {
+                HtmlGenericControl nestedUL = createNestedUL();
 
-             foreach (Group group in composite.Groups)
-             {
-                 HtmlGenericControl listItemGroup = createListTextItem(group.NAME, "?group=" + group.ID);
-                 nestedUL.Controls.Add(listItemGroup);
-             }
+                foreach (Group group in composite.Groups)
+                {
+                    HtmlGenericControl listItemGroup = createListTextItem(group.NAME, "?group=" + group.ID);
+                    nestedUL.Controls.Add(listItemGroup);
+                }
 
-             nodeListItem.Controls.Add(nestedUL);
+                nodeListItem.Controls.Add(nestedUL);
+            }
         }
 
         protected void buttonPdf_Click(object sender, EventArgs e)

@@ -27,5 +27,14 @@ namespace SchedulePresenter.DAL
 
             return schedules.FirstOrDefault();
         }
+
+        public bool HasCurrentSchedule(int groupID)
+        {
+            var schedules = from schedule in context.CurrentSchedule
+                            where schedule.GROUP_ID == groupID
+                            select schedule;
+
+            return schedules.ToList().Count > 0 ? true : false;
+        }
     }
 }
